@@ -1,23 +1,41 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Hero } from "@/components/home/Hero";
+import { RecentItems } from "@/components/home/RecentItems";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { SmartMatching } from "@/components/home/SmartMatching";
+import { AssistantSection } from "@/components/home/AssistantSection";
+import { CtaBand } from "@/components/home/CtaBand";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "FindIt – Campus Lost & Found" },
+      {
+        name: "description",
+        content: "Lost something on campus? Search found items, report lost belongings and get AI-matched with what you're looking for.",
+      },
+      { property: "og:title", content: "FindIt – Campus Lost & Found" },
+      {
+        property: "og:description",
+        content: "One place for every lost and found item on campus, with AI smart matching and a helpful assistant.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: HomePage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function HomePage() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      <Hero />
+      <RecentItems type="lost" />
+      <RecentItems type="found" muted />
+      <HowItWorks />
+      <SmartMatching />
+      <AssistantSection />
+      <CtaBand />
+    </>
   );
 }

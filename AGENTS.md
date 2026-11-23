@@ -28,3 +28,10 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Sample items live in `src/data/items.ts` (with `filterItems`/`getPossibleMatches`); pages read only through these helpers so swapping in the database later touches one module.
+- Page sections are reusable components under `src/components/{site,home,items,assistant}`; routes in `src/routes` only compose them and set `head()`.
+- Assistant replies come from `src/components/assistant/replies.ts` as a placeholder; the Gemini integration should replace `getAssistantReply` without changing `ChatPanel`.
+- Colours, gradients and shadows are tokens/utilities in `src/styles.css`; components use those (e.g. `bg-gradient-navy`, `text-lost`, Button `hero`/`lost`/`found` variants), never raw colour classes.
