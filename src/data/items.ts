@@ -234,6 +234,84 @@ export function getItem(id: string): Item | undefined {
 }
 
 /** Items of the opposite type in the same category — a stand-in for AI matching until Gemini is wired in. */
-export function getPossibleMatches(item: Item, limit = 3): Item[] {
-  return ITEMS.filter((i) => i.type !== item.type && i.category === item.category).slice(0, limit);
+export function getPossibleMatches(item: Item, pool: Item[] = ITEMS, limit = 3): Item[] {
+  return pool.filter((i) => i.type !== item.type && i.category === item.category).slice(0, limit);
+}
+
+/* ---------- Database rows ---------- */
+
+export type ItemStatus = "active" | "claimed" | "returned";
+
+/** Shape of a row in the `items` table. */
+export interface ItemRow {
+  id: string;
+  user_id: string;
+  item_name: string;
+  category: string;
+  item_type: string;
+  description: string;
+  campus_location: string;
+  item_date: string;
+  image_url: string | null;
+  status: string;
+  created_at: string;
+}
+
+/** Photo shown for a report posted without one. */
+export const CATEGORY_IMAGES: Record<Category, string> = {
+  "ID Cards": idCard,
+  Wallets: wallet,
+  Electronics: earphones,
+  Books: book,
+  Keys: keys,
+  Bottles: bottle,
+  Other: wallet,
+};
+
+export function toCategory(value: string): Category {
+  return (CATEGORIES as readonly string[]).includes(value) ? (value as Category) : "Other";
+}
+
+/** "2026-11-22" → "Nov 22, 2026" (UTC, so server and browser agree). */
+export function formatItemDate(isoDate: string): string {
+  const d = new Date(`${isoDate.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return isoDate;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+}
+
+/** Relative "posted" label from a timestamp. */
+export function formatPostedLabel(createdAt: string, now: Date = new Date()): string {
+  const diffMs = now.getTime() - new Date(createdAt).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (Number.isNaN(mins) || mins < 1) return "Just now";
+  if (mins < 60) return `${mins} min${mins === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  if (days < 30) return `${days} days ago`;
+  return formatItemDate(createdAt);
+}
+
+export function mapItemRow(row: ItemRow, now: Date = new Date()): Item {
+  const category = toCategory(row.category);
+  return {
+    id: row.id,
+    type: row.item_type === "found" ? "found" : "lost",
+    title: row.item_name,
+    category,
+    description: row.description,
+    location: row.campus_location,
+    date: formatItemDate(row.item_date),
+    postedLabel: formatPostedLabel(row.created_at, now),
+    image: row.image_url || CATEGORY_IMAGES[category],
+    reporter: "FindIt student",
+  };
+}
+
+export type ItemSource = "database" | "sample";
+
+/** Real reports win: sample items are shown only while the database has no active reports. */
+export function chooseItems(dbItems: Item[]): { items: Item[]; source: ItemSource } {
+  return dbItems.length > 0 ? { items: dbItems, source: "database" } : { items: ITEMS, source: "sample" };
 }

@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PackageX } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { CATEGORIES, ITEMS, filterItems, type Category, type ItemType } from "@/data/items";
+import { CATEGORIES, filterItems, type Category, type ItemType } from "@/data/items";
+import { itemsQueryOptions } from "@/data/items-queries";
 import { ItemCard } from "@/components/items/ItemCard";
 import { SearchBar } from "@/components/items/SearchBar";
 import { PageHeader } from "@/components/site/PageHeader";
@@ -23,6 +25,7 @@ export const Route = createFileRoute("/browse")({
     if (typeof cat === "string" && (CATEGORIES as readonly string[]).includes(cat)) out.category = cat as Category;
     return out;
   },
+  loader: ({ context }) => context.queryClient.ensureQueryData(itemsQueryOptions()),
   head: () => ({
     meta: [
       { title: "Browse Lost & Found Items – FindIt" },
@@ -45,7 +48,8 @@ const TYPE_TABS: { value: ItemType | undefined; label: string }[] = [
 function BrowsePage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/browse" });
-  const results = useMemo(() => filterItems(ITEMS, search), [search]);
+  const { data } = useSuspenseQuery(itemsQueryOptions());
+  const results = useMemo(() => filterItems(data.items, search), [data.items, search]);
 
   const setSearch = (patch: Partial<Record<keyof BrowseSearch, string | undefined>>) =>
     navigate({
@@ -132,6 +136,11 @@ function BrowsePage() {
             </>
           )}
         </p>
+        {data.source === "sample" && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            These are example items — real reports will appear here as soon as students post them.
+          </p>
+        )}
 
         {results.length > 0 ? (
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

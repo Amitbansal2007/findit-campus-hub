@@ -31,7 +31,9 @@ use the editor.
 
 ## Project rules
 
-- Sample items live in `src/data/items.ts` (with `filterItems`/`getPossibleMatches`); pages read only through these helpers so swapping in the database later touches one module.
+- Item data: pure types/helpers and sample items in `src/data/items.ts`; public reads go through server functions in `src/data/items.functions.ts` (publishable key, RLS decides) via `src/data/items-queries.ts`; report saving runs in the browser as the signed-in user in `src/data/submit-report.ts`. Sample items show only when the database has no active reports (`chooseItems`), so real data always wins.
+- Photos go to the `item-photos` bucket under `<user_id>/…`; storage rules only allow writes inside the uploader's own folder.
+- Session state comes from the single listener in `src/components/site/AuthProvider.tsx` (`useAuth`); never add per-page auth listeners.
 - Page sections are reusable components under `src/components/{site,home,items,assistant}`; routes in `src/routes` only compose them and set `head()`.
 - Assistant replies come from `src/components/assistant/replies.ts` as a placeholder; the Gemini integration should replace `getAssistantReply` without changing `ChatPanel`.
 - Colours, gradients and shadows are tokens/utilities in `src/styles.css`; components use those (e.g. `bg-gradient-navy`, `text-lost`, Button `hero`/`lost`/`found` variants), never raw colour classes.

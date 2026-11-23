@@ -1,16 +1,16 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Calendar, Hand, MapPin, MessageCircle, Share2, Sparkles, Tag, User } from "lucide-react";
 import { toast } from "sonner";
-import { getItem, getPossibleMatches } from "@/data/items";
+import { itemDetailQueryOptions } from "@/data/items-queries";
 import { ItemCard } from "@/components/items/ItemCard";
 import { StatusBadge } from "@/components/items/StatusBadge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/items/$itemId")({
-  loader: ({ params }) => {
-    const item = getItem(params.itemId);
-    if (!item) throw notFound();
-    return { item, matches: getPossibleMatches(item) };
+  loader: async ({ params, context }) => {
+    const detail = await context.queryClient.ensureQueryData(itemDetailQueryOptions(params.itemId));
+    if (!detail) throw notFound();
+    return detail;
   },
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [{ title: "Item unavailable – FindIt" }, { name: "robots", content: "noindex" }] };
@@ -70,7 +70,7 @@ function ItemPage() {
             <span className="text-sm text-muted-foreground">Posted {item.postedLabel.toLowerCase()}</span>
           </div>
           <h1 className="mt-4 text-3xl font-bold leading-tight text-foreground sm:text-4xl">{item.title}</h1>
-          <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{item.description}</p>
+          <p className="mt-4 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{item.description}</p>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-2">
             {details.map((d) => (

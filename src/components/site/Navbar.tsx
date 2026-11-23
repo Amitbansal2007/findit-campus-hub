@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, PackageSearch, PackagePlus, LogIn, Home, LayoutGrid } from "lucide-react";
+import { Menu, PackageSearch, PackagePlus, LogIn, LogOut, Home, LayoutGrid, UserRound } from "lucide-react";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
+import { displayName, useAuth } from "./AuthProvider";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
@@ -16,6 +18,13 @@ const NAV = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    setOpen(false);
+    await signOut();
+    toast.success("You've been logged out");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -50,16 +59,30 @@ export function Navbar() {
         </ul>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button asChild variant="ghost">
-            <Link to="/auth" search={{ mode: "login" }}>
-              Log in
-            </Link>
-          </Button>
-          <Button asChild variant="hero">
-            <Link to="/auth" search={{ mode: "register" }}>
-              Get started
-            </Link>
-          </Button>
+          {user ? (
+            <>
+              <span className="flex max-w-[180px] items-center gap-2 truncate rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-soft">
+                <UserRound className="h-4 w-4 shrink-0 text-navy-soft" />
+                <span className="truncate">{displayName(user)}</span>
+              </span>
+              <Button variant="ghost" onClick={handleSignOut}>
+                <LogOut /> Log out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="ghost">
+                <Link to="/auth" search={{ mode: "login" }}>
+                  Log in
+                </Link>
+              </Button>
+              <Button asChild variant="hero">
+                <Link to="/auth" search={{ mode: "register" }}>
+                  Get started
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
@@ -90,11 +113,23 @@ export function Navbar() {
               ))}
             </ul>
             <div className="mt-6 flex flex-col gap-2 px-4">
-              <Button asChild variant="hero" size="xl" onClick={() => setOpen(false)}>
-                <Link to="/auth" search={{ mode: "login" }}>
-                  <LogIn /> Log in / Register
-                </Link>
-              </Button>
+              {user ? (
+                <>
+                  <p className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
+                    <UserRound className="h-4 w-4 text-navy-soft" /> Signed in as{" "}
+                    <span className="truncate font-medium text-foreground">{displayName(user)}</span>
+                  </p>
+                  <Button variant="outline" size="xl" onClick={handleSignOut}>
+                    <LogOut /> Log out
+                  </Button>
+                </>
+              ) : (
+                <Button asChild variant="hero" size="xl" onClick={() => setOpen(false)}>
+                  <Link to="/auth" search={{ mode: "login" }}>
+                    <LogIn /> Log in / Register
+                  </Link>
+                </Button>
+              )}
             </div>
           </SheetContent>
         </Sheet>

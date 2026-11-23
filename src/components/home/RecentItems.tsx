@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { ITEMS, type ItemType } from "@/data/items";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import type { ItemType } from "@/data/items";
+import { itemsQueryOptions } from "@/data/items-queries";
 import { ItemCard } from "@/components/items/ItemCard";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeading } from "@/components/site/SectionHeading";
@@ -20,7 +22,8 @@ const COPY: Record<ItemType, { eyebrow: string; title: string; description: stri
 };
 
 export function RecentItems({ type, muted = false }: { type: ItemType; muted?: boolean }) {
-  const items = ITEMS.filter((i) => i.type === type).slice(0, 4);
+  const { data } = useSuspenseQuery(itemsQueryOptions());
+  const items = data.items.filter((i) => i.type === type).slice(0, 4);
   const copy = COPY[type];
   return (
     <section className={muted ? "bg-muted/50 py-20 lg:py-24" : "py-20 lg:py-24"}>
@@ -39,6 +42,14 @@ export function RecentItems({ type, muted = false }: { type: ItemType; muted?: b
             }
           />
         </Reveal>
+        {items.length === 0 && (
+          <p className="mt-10 rounded-2xl border border-dashed border-border bg-card/60 px-6 py-10 text-center text-sm text-muted-foreground">
+            No {type} items reported yet.{" "}
+            <Link to={type === "lost" ? "/report-lost" : "/report-found"} className="font-semibold text-foreground hover:underline">
+              Be the first to report one
+            </Link>
+          </p>
+        )}
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item, i) => (
             <Reveal key={item.id} delay={i * 80}>

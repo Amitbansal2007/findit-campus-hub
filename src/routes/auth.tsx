@@ -1,17 +1,42 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Loader2, ScanSearch, ShieldCheck, Sparkles, Users } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { Eye, EyeOff, Loader2, MailCheck, ScanSearch, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/site/AuthProvider";
 
 type Mode = "login" | "register";
+interface AuthSearch {
+  mode?: Mode;
+  redirect?: string;
+}
+
+/** Turns sign-in errors into plain messages. */
+function friendlyAuthError(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login")) return "Wrong email or password. Please try again.";
+  if (m.includes("not confirmed")) return "Please confirm your email first — check your inbox for the link.";
+  if (m.includes("already registered") || m.includes("already been registered")) return "An account with this email already exists. Try logging in.";
+  if (m.includes("password")) return message;
+  if (m.includes("rate limit") || m.includes("too many")) return "Too many attempts. Please wait a minute and try again.";
+  if (m.includes("disabled") || m.includes("not enabled")) return "Email sign-in isn't switched on yet for FindIt.";
+  return "Something went wrong. Please try again.";
+}
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { mode?: Mode } =>
-    search["mode"] === "register" ? { mode: "register" } : search["mode"] === "login" ? { mode: "login" } : {},
+  validateSearch: (search: Record<string, unknown>): AuthSearch => {
+    const out: AuthSearch = {};
+    if (search["mode"] === "register" || search["mode"] === "login") out.mode = search["mode"];
+    const redirect = search["redirect"];
+    // Only same-site paths, never another website.
+    if (typeof redirect === "string" && redirect.startsWith("/") && !redirect.startsWith("//") && !redirect.startsWith("/auth"))
+      out.redirect = redirect.slice(0, 200);
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "Log in or Register – FindIt" },
@@ -32,27 +57,68 @@ const PERKS = [
 ];
 
 function AuthPage() {
-  const { mode = "login" } = Route.useSearch();
+  const { mode = "login", redirect } = Route.useSearch();
   const navigate = useNavigate({ from: "/auth" });
+  const router = useRouter();
+  const { user, ready } = useAuth();
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const isLogin = mode === "login";
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const goNext = () => router.history.push(redirect ?? "/");
+
+  // Already signed in: continue where they were heading.
+  useEffect(() => {
+    if (ready && user) goNext();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, user]);
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
+    const data = new FormData(form);
+    const email = String(data.get("email") ?? "").trim().toLowerCase();
+    const password = String(data.get("password") ?? "");
     setLoading(true);
-    // Real sign-in arrives with the backend step.
-    window.setTimeout(() => {
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("Welcome back!");
+        goNext();
+      } else {
+        const fullName = String(data.get("name") ?? "").trim().slice(0, 80);
+        const roll = String(data.get("roll") ?? "").trim().slice(0, 30);
+        const { data: res, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}${redirect ?? "/"}`,
+            data: { full_name: fullName, roll_number: roll },
+          },
+        });
+        if (error) throw error;
+        if (res.session) {
+          toast.success("Account created — you're logged in");
+          goNext();
+        } else if (res.user && (res.user.identities?.length ?? 0) === 0) {
+          toast.error("An account with this email already exists. Try logging in.");
+        } else {
+          setPendingEmail(email);
+          toast.success("Almost there — check your email to confirm your account");
+        }
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      toast.error(friendlyAuthError(message));
+    } finally {
       setLoading(false);
-      toast.info("Accounts are coming soon", {
-        description: "Sign-in will be enabled once the backend is connected.",
-      });
-    }, 800);
+    }
   };
 
   return (
@@ -97,7 +163,10 @@ function AuthPage() {
               <button
                 key={m}
                 type="button"
-                onClick={() => navigate({ search: { mode: m }, replace: true })}
+                onClick={() => {
+                  setPendingEmail(null);
+                  void navigate({ search: (prev) => ({ ...prev, mode: m }), replace: true });
+                }}
                 className={cn(
                   "rounded-lg py-2 text-sm font-medium transition-all",
                   mode === m ? "bg-card text-foreground shadow-soft" : "text-muted-foreground hover:text-foreground",
@@ -108,6 +177,18 @@ function AuthPage() {
             ))}
           </div>
 
+          {pendingEmail ? (
+            <div className="mt-6 rounded-2xl border border-border bg-card p-6 text-center shadow-soft">
+              <span className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-found-soft text-found">
+                <MailCheck className="h-6 w-6" />
+              </span>
+              <h2 className="mt-4 text-lg font-semibold text-foreground">Check your email</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                We sent a confirmation link to <span className="font-medium text-foreground">{pendingEmail}</span>. Open
+                it to activate your account, then log in.
+              </p>
+            </div>
+          ) : (
           <form key={mode} onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
             {!isLogin && (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -164,13 +245,15 @@ function AuthPage() {
               {isLogin ? "Log in" : "Create account"}
             </Button>
           </form>
+          )}
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {isLogin ? "New to FindIt? " : "Already have an account? "}
             <Link
               to="/auth"
-              search={{ mode: isLogin ? "register" : "login" }}
+              search={(prev) => ({ ...prev, mode: isLogin ? "register" : "login" })}
               replace
+              onClick={() => setPendingEmail(null)}
               className="font-semibold text-foreground hover:underline"
             >
               {isLogin ? "Create an account" : "Log in"}

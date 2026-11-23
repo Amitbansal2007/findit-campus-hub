@@ -5,8 +5,10 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { SmartMatching } from "@/components/home/SmartMatching";
 import { AssistantSection } from "@/components/home/AssistantSection";
 import { CtaBand } from "@/components/home/CtaBand";
+import { itemsQueryOptions } from "@/data/items-queries";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(itemsQueryOptions()),
   head: () => ({
     meta: [
       { title: "FindIt – Campus Lost & Found" },

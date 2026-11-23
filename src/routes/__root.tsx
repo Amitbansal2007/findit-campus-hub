@@ -15,6 +15,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { ChatWidget } from "@/components/assistant/ChatWidget";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/components/site/AuthProvider";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -131,6 +132,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthProvider>
       <div className="flex min-h-screen flex-col">
         <Navbar />
         <main className="flex-1">
@@ -141,6 +143,7 @@ function RootComponent() {
       </div>
       <ChatWidget />
       <Toaster position="top-center" richColors />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
