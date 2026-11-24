@@ -1,7 +1,8 @@
 import { Bot, Send, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { cn } from "@/lib/utils";
-import { SUGGESTIONS, getAssistantReply, type ChatMessage } from "./replies";
+import { SUGGESTIONS, type ChatMessage } from "./replies";
+import { askFindItAssistant } from "@/data/items.functions";
 
 let counter = 0;
 const nextId = () => `m${++counter}`;
@@ -22,17 +23,66 @@ export function ChatPanel({ className, compact = false }: { className?: string; 
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
-  const send = (text: string) => {
-    const value = text.trim();
-    if (!value || typing) return;
-    setMessages((m) => [...m, { id: nextId(), role: "user", text: value }]);
-    setInput("");
-    setTyping(true);
-    window.setTimeout(() => {
-      setMessages((m) => [...m, { id: nextId(), role: "assistant", text: getAssistantReply(value) }]);
-      setTyping(false);
-    }, 900);
-  };
+  
+
+
+const send = async (text: string) => {
+  const value = text.trim();
+  if (!value || typing) return;
+
+  setMessages((m) => [
+    ...m,
+    { id: nextId(), role: "user", text: value },
+  ]);
+
+  setInput("");
+
+  // Handle greetings
+  if (/^(hi|hello|hey|good morning|good afternoon|good evening)[!.?\s]*$/i.test(value)) {
+    setMessages((m) => [
+      ...m,
+      {
+        id: nextId(),
+        role: "assistant",
+        text: "Hello! 👋 Welcome to FindIt Assistant. Are you looking for a lost item or trying to find the owner of something you found?",
+      },
+    ]);
+    return;
+  }
+
+  setTyping(true);
+
+  try {
+    const reply = await askFindItAssistant({
+      data: { query: value },
+    });
+
+    setMessages((m) => [
+      ...m,
+      {
+        id: nextId(),
+        role: "assistant",
+        text: reply,
+      },
+    ]);
+  } catch (error) {
+    console.error("FindIt Assistant error:", error);
+
+    setMessages((m) => [
+      ...m,
+      {
+        id: nextId(),
+        role: "assistant",
+        text: "Sorry, something went wrong. Please try again.",
+      },
+    ]);
+  } finally {
+    setTyping(false);
+  }
+};
+
+
+
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -70,7 +120,21 @@ export function ChatPanel({ className, compact = false }: { className?: string; 
                   : "rounded-bl-md border border-border bg-card text-foreground shadow-soft",
               )}
             >
-              {m.text}
+              {m.text.split(/(\[\[ITEM:[^\]]+\]\])/g).map((part, index) => {
+  const match = part.match(/^\[\[ITEM:([0-9a-f-]{36})\]\]$/i);
+
+  return match ? (
+    <a
+      key={index}
+      href={`/items/${match[1]}`}
+      className="text-primary underline font-semibold"
+    >
+      View item
+    </a>
+  ) : (
+    <span key={index}>{part}</span>
+  );
+})}
             </div>
           </div>
         ))}

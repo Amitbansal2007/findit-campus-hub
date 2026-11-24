@@ -229,6 +229,91 @@ export function filterItems(items: Item[], filters: ItemFilters): Item[] {
   });
 }
 
+/** Smarter search specifically for FindIt Assistant. */
+export function searchAssistantItems(
+  items: Item[],
+  filters: ItemFilters
+): Item[] {
+  const q = filters.q?.trim().toLowerCase() ?? "";
+
+  if (filters.type && !q) {
+    return items.filter((item) => item.type === filters.type);
+  }
+
+  if (!q) return items;
+
+  const normalized = q.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+
+  // Recognize campus locations.
+  const matchedLocation =
+    CAMPUS_LOCATIONS.find((loc) =>
+      normalized.includes(loc.toLowerCase())
+    ) ??
+    (/\blibrary\b/.test(normalized) ? "Central Library" : undefined);
+
+  const locationWords = matchedLocation
+    ? matchedLocation.toLowerCase().split(/\s+/)
+    : [];
+
+  // Remove location words before searching for the item.
+  const itemTerms = normalized
+    .split(/\s+/)
+    .filter((word) => word && !locationWords.includes(word));
+
+  const categoryKeywords: Record<Category, string[]> = {
+    "ID Cards": ["id", "card", "identity"],
+    Wallets: ["wallet", "purse"],
+    Electronics: ["earbud", "earphone", "airpod", "headphone"],
+    Books: ["book", "textbook", "math"],
+    Keys: ["key", "keys"],
+    Bottles: ["bottle", "water"],
+    Other: ["other"],
+  };
+
+  const results = items.filter((item) => {
+    if (filters.type && item.type !== filters.type) return false;
+    if (filters.category && item.category !== filters.category) return false;
+
+    const locationMatch = matchedLocation
+      ? item.location.toLowerCase().includes(matchedLocation.toLowerCase())
+      : false;
+
+    // If the query only contains a location, filter by location.
+    if (itemTerms.length === 0) return locationMatch;
+
+    const searchableText =
+      `${item.title} ${item.description} ${item.category} ${item.color ?? ""}`
+        .toLowerCase();
+
+    const itemMatch = itemTerms.some((term) => {
+      if (searchableText.includes(term)) return true;
+
+      return categoryKeywords[item.category].some(
+        (keyword) => keyword.includes(term) || term.includes(keyword)
+      );
+    });
+
+    return itemMatch;
+  });
+
+  // Prefer location matches, but don't hide other possible item matches.
+  if (matchedLocation && itemTerms.length > 0) {
+    results.sort((a, b) => {
+      const aMatch = a.location.toLowerCase().includes(
+        matchedLocation.toLowerCase()
+      );
+      const bMatch = b.location.toLowerCase().includes(
+        matchedLocation.toLowerCase()
+      );
+
+      return Number(bMatch) - Number(aMatch);
+    });
+  }
+
+  return results;
+}
+
+
 export function getItem(id: string): Item | undefined {
   return ITEMS.find((i) => i.id === id);
 }
