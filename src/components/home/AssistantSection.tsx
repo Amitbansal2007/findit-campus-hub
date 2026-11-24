@@ -22,7 +22,7 @@ export function AssistantSection() {
           <ul className="mt-8 space-y-4">
             {POINTS.map((p) => (
               <li key={p.text} className="flex items-center gap-3 text-sm text-foreground">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent text-navy">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-teal-soft text-teal-deep">
                   <p.icon className="h-4 w-4" />
                 </span>
                 {p.text}

@@ -37,20 +37,28 @@ export function Navbar() {
     <header
       className={cn(
         "sticky top-0 z-40 w-full transition-all duration-300",
-        scrolled ? "border-b border-border/70 bg-background/80 backdrop-blur-xl" : "bg-transparent",
+        scrolled ? "border-b border-border/70 bg-background/85 shadow-soft backdrop-blur-xl" : "bg-transparent",
       )}
     >
-      <nav className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <nav
+        className={cn(
+          "mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 transition-[padding] duration-300 sm:px-6 lg:px-8",
+          scrolled ? "py-2.5" : "py-4",
+        )}
+      >
         <Logo />
 
-        <ul className="hidden items-center gap-1 rounded-full border border-border/70 bg-card/70 p-1 shadow-soft backdrop-blur lg:flex">
+        <ul className="hidden items-center gap-0.5 rounded-full border border-border/70 bg-card/75 p-1 shadow-soft backdrop-blur lg:flex">
           {NAV.map((item) => (
             <li key={item.to}>
               <Link
                 to={item.to}
                 activeOptions={{ exact: true }}
-                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                activeProps={{ className: "bg-primary text-primary-foreground hover:text-primary-foreground" }}
+                className="relative block rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                activeProps={{
+                  className:
+                    "bg-primary text-primary-foreground shadow-soft hover:bg-primary hover:text-primary-foreground",
+                }}
               >
                 {item.label}
               </Link>
@@ -62,21 +70,21 @@ export function Navbar() {
           {user ? (
             <>
               <span className="flex max-w-[180px] items-center gap-2 truncate rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-soft">
-                <UserRound className="h-4 w-4 shrink-0 text-navy-soft" />
+                <UserRound className="h-4 w-4 shrink-0 text-teal-deep" />
                 <span className="truncate">{displayName(user)}</span>
               </span>
-              <Button variant="ghost" onClick={handleSignOut}>
+              <Button variant="ghost" className="rounded-full hover:bg-secondary" onClick={handleSignOut}>
                 <LogOut /> Log out
               </Button>
             </>
           ) : (
             <>
-              <Button asChild variant="ghost">
+              <Button asChild variant="ghost" className="rounded-full px-4 text-muted-foreground hover:bg-secondary hover:text-foreground">
                 <Link to="/auth" search={{ mode: "login" }}>
                   Log in
                 </Link>
               </Button>
-              <Button asChild variant="hero">
+              <Button asChild variant="hero" className="rounded-full px-5">
                 <Link to="/auth" search={{ mode: "register" }}>
                   Get started
                 </Link>

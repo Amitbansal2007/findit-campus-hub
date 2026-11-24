@@ -13,7 +13,7 @@ export function SearchBar({
 }: {
   defaultValue?: string;
   onSearch?: (q: string) => void;
-  size?: "md" | "lg";
+  size?: "md" | "lg" | "xl";
   className?: string;
 }) {
   const [q, setQ] = useState(defaultValue);
@@ -36,11 +36,18 @@ export function SearchBar({
       onSubmit={submit}
       role="search"
       className={cn(
-        "flex items-center gap-2 rounded-2xl border border-border bg-card p-2 shadow-elevated transition-shadow focus-within:ring-2 focus-within:ring-ring/30",
+        "flex items-center gap-2 rounded-2xl border border-border bg-card p-2 shadow-elevated transition-all focus-within:ring-2 focus-within:ring-ring/30",
+        size === "xl" &&
+          "rounded-[1.35rem] sm:p-2.5 focus-within:border-teal/50 focus-within:ring-4 focus-within:ring-teal/15",
         className,
       )}
     >
-      <Search className="ml-3 h-5 w-5 shrink-0 text-muted-foreground" />
+      <Search
+        className={cn(
+          "ml-3 h-5 w-5 shrink-0",
+          size === "xl" ? "text-teal-deep sm:ml-4" : "text-muted-foreground",
+        )}
+      />
       <input
         value={q}
         onChange={(e) => {
@@ -51,12 +58,19 @@ export function SearchBar({
         aria-label="Search lost and found items"
         className={cn(
           "min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground",
-          size === "lg" ? "h-11 text-base" : "h-9 text-sm",
+          size === "xl" ? "h-12 text-base sm:text-[1.05rem]" : size === "lg" ? "h-11 text-base" : "h-9 text-sm",
         )}
       />
-      <Button type="submit" variant="hero" size={size === "lg" ? "xl" : "default"} className="rounded-xl">
-        Search
-      </Button>
+      {size === "xl" ? (
+        <Button type="submit" variant="hero" size="xl" aria-label="Search" className="rounded-2xl px-4 sm:px-7">
+          <Search className="sm:hidden" />
+          <span className="hidden sm:inline">Search</span>
+        </Button>
+      ) : (
+        <Button type="submit" variant="hero" size={size === "lg" ? "xl" : "default"} className="rounded-xl">
+          Search
+        </Button>
+      )}
     </form>
   );
 }

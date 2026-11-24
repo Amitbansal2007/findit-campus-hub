@@ -1,4 +1,4 @@
-import { Brain, MapPin, ScanText, ShieldCheck, Sparkles } from "lucide-react";
+import { Brain, Check, MapPin, ScanText, ShieldCheck, Sparkles } from "lucide-react";
 import idCard from "@/assets/item-id-card.jpg";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeading } from "@/components/site/SectionHeading";
@@ -10,17 +10,17 @@ const FEATURES = [
 ];
 
 const SIGNALS = [
-  ["Category", "ID Cards", 100],
-  ["Colour", "Navy lanyard", 96],
-  ["Location", "Library → Admin", 82],
-  ["Date", "Within 24 hours", 98],
+  ["Category", "Both are ID cards"],
+  ["Description", "Navy lanyard mentioned in both"],
+  ["Location", "Central Library → Admin Building"],
+  ["Date", "Reported close together"],
 ] as const;
 
 export function SmartMatching() {
   return (
     <section className="relative overflow-hidden bg-gradient-navy py-20 lg:py-28">
       <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(60%_70%_at_70%_40%,black,transparent)]" />
-      <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-sky/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-teal/20 blur-3xl" />
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
         <Reveal>
           <SectionHeading
@@ -37,7 +37,7 @@ export function SmartMatching() {
           <ul className="mt-10 space-y-5">
             {FEATURES.map((f) => (
               <li key={f.title} className="flex gap-4">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-navy-foreground/15 bg-navy-foreground/10 text-sky">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-navy-foreground/15 bg-navy-foreground/10 text-teal-bright">
                   <f.icon className="h-5 w-5" />
                 </span>
                 <div>
@@ -53,10 +53,10 @@ export function SmartMatching() {
           <div className="relative rounded-3xl border border-navy-foreground/15 bg-navy-foreground/[0.06] p-5 backdrop-blur-md sm:p-7">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-2 text-sm font-medium text-navy-foreground">
-                <Brain className="h-4 w-4 text-sky" /> Match analysis
+                <Brain className="h-4 w-4 text-teal-bright" /> How a match is spotted
               </span>
-              <span className="rounded-full bg-found/20 px-3 py-1 text-xs font-semibold text-found-soft">
-                High confidence
+              <span className="rounded-full bg-teal/20 px-3 py-1 text-xs font-semibold text-teal-bright">
+                Example
               </span>
             </div>
 
@@ -71,7 +71,7 @@ export function SmartMatching() {
                 <span className="grid h-14 w-14 place-items-center rounded-full bg-navy-foreground text-navy shadow-glow animate-pulse-ring">
                   <Sparkles className="h-6 w-6" />
                 </span>
-                <span className="font-display text-xl font-bold text-navy-foreground">94%</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-navy-foreground">Possible match</span>
               </div>
               <div className="rounded-2xl bg-card p-3 shadow-elevated">
                 <img src={idCard} alt="Found student ID card" className="aspect-square w-full rounded-xl object-cover object-right" loading="lazy" />
@@ -81,21 +81,20 @@ export function SmartMatching() {
               </div>
             </div>
 
-            <div className="mt-6 space-y-3">
-              {SIGNALS.map(([label, value, score]) => (
-                <div key={label}>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-navy-muted">
-                      {label} · <span className="text-navy-foreground">{value}</span>
-                    </span>
-                    <span className="font-semibold text-navy-foreground">{score}%</span>
-                  </div>
-                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-navy-foreground/10">
-                    <div className="h-full rounded-full bg-sky" style={{ width: `${score}%` }} />
-                  </div>
-                </div>
+            <ul className="mt-6 space-y-2.5">
+              {SIGNALS.map(([label, value]) => (
+                <li
+                  key={label}
+                  className="flex items-center gap-3 rounded-xl border border-navy-foreground/10 bg-navy-foreground/[0.04] px-3 py-2.5 text-xs"
+                >
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-teal/25 text-teal-bright">
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
+                  <span className="w-20 shrink-0 font-semibold text-navy-foreground">{label}</span>
+                  <span className="min-w-0 text-navy-muted">{value}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </Reveal>
       </div>
