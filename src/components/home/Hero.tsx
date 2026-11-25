@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import heroImage from "@/assets/hero-items.jpg";
+import heroImage from "@/assets/hero-campus-desk.jpg";
 import { SearchBar } from "@/components/items/SearchBar";
 import { ReportActions } from "./ReportActions";
 
