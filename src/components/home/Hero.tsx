@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   ArrowUpRight,
+  Camera,
   CheckCircle2,
   MapPin,
   PackagePlus,
