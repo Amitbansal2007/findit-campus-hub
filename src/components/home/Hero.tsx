@@ -1,6 +1,17 @@
+
 import { Link } from "@tanstack/react-router";
-import { Camera, MapPin, ShieldCheck, Sparkles } from "lucide-react";
-import heroImage from "@/assets/hero-campus-desk.jpg";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  CheckCircle2,
+  MapPin,
+  PackagePlus,
+  PackageSearch,
+  Search,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+import heroImage from "@/assets/hero-items.jpg";
 import { SearchBar } from "@/components/items/SearchBar";
 import { ReportActions } from "./ReportActions";
 
@@ -14,123 +25,169 @@ const FEATURES = [
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-home">
-      <div className="pointer-events-none absolute inset-0 bg-grid-light [mask-image:radial-gradient(65%_55%_at_70%_20%,black,transparent)]" />
-      <div className="pointer-events-none absolute -right-40 top-10 h-[28rem] w-[28rem] rounded-full bg-teal/10 blur-3xl" />
+    <section className="relative isolate overflow-hidden bg-[#f5f8fc]">
+      {/* Background decoration */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -right-40 -top-40 h-[550px] w-[550px] rounded-full bg-cyan-100/60 blur-[110px]" />
+        <div className="absolute -bottom-40 -left-40 h-[450px] w-[450px] rounded-full bg-blue-100/70 blur-[100px]" />
+        <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(#10254b_1px,transparent_1px),linear-gradient(90deg,#10254b_1px,transparent_1px)] [background-size:48px_48px]" />
+      </div>
 
-      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-20 pt-8 sm:px-6 sm:pt-12 lg:grid-cols-12 lg:gap-12 lg:px-8 lg:pb-28 lg:pt-16">
-        {/* Copy */}
-        <div className="lg:col-span-6">
-          <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-border bg-card/80 py-1 pl-1 pr-3.5 text-xs font-medium text-navy-soft shadow-soft backdrop-blur">
-            <span className="rounded-full bg-teal-soft px-2 py-0.5 text-[11px] font-semibold text-teal-deep">New</span>
-            AI-assisted lost & found for your campus
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-12 lg:gap-12 lg:px-10 lg:pb-28 lg:pt-24">
+
+        {/* LEFT CONTENT */}
+        <div className="relative z-10 lg:col-span-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white/80 px-4 py-2 text-xs font-semibold tracking-wide text-[#087e83] shadow-sm backdrop-blur">
+            <Sparkles className="h-4 w-4" />
+            YOUR CAMPUS. YOUR COMMUNITY. YOUR FINDIT.
           </div>
 
-          <h1 className="animate-fade-up mt-6 text-[2.75rem] font-extrabold leading-[1.02] tracking-[-0.035em] text-foreground [animation-delay:80ms] sm:text-6xl lg:text-[4.25rem]">
-            Lost on campus?
-            <br />
-            <span className="relative inline-block text-teal-deep">
-              Found
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 200 14"
-                preserveAspectRatio="none"
-                className="absolute -bottom-1.5 left-0 h-3 w-full text-teal sm:-bottom-2"
-              >
-                <path
-                  d="M2 9 C 50 2, 120 2, 198 7"
-                  pathLength={1}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeDasharray="1"
-                  className="animate-draw opacity-60"
-                />
-              </svg>
-            </span>{" "}
-            on FindIt.
+          <h1 className="mt-8 max-w-2xl text-5xl font-black leading-[1.02] tracking-[-0.055em] text-[#101c35] sm:text-6xl lg:text-[4.65rem]">
+            Lost something?
+            <span className="mt-2 block text-[#087e83]">
+              Bring it back.
+            </span>
           </h1>
 
-          <p className="animate-fade-up mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground [animation-delay:160ms]">
-            One trusted place for every lost and found report on campus — so your ID card, wallet or earphones
-            find their way back to you.
+          <p className="mt-7 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
+            From misplaced keys to lost ID cards, FindIt makes it easier
+            for your campus community to report, discover and return
+            belongings.
           </p>
 
-          <div className="animate-fade-up mt-8 max-w-xl [animation-delay:240ms]">
-            <SearchBar size="xl" />
-            <div className="mt-3.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span className="mr-0.5 font-medium">Popular:</span>
-              {POPULAR.map((p) => (
-                <Link
-                  key={p}
-                  to="/browse"
-                  search={{ q: p }}
-                  className="rounded-full border border-border bg-card/90 px-3 py-1 transition-all duration-200 hover:-translate-y-px hover:border-teal/40 hover:text-teal-deep"
-                >
-                  {p}
-                </Link>
-              ))}
-            </div>
+          {/* SEARCH */}
+          <div className="mt-9 max-w-xl rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_18px_55px_-25px_rgba(15,35,70,0.28)]">
+            <SearchBar />
           </div>
 
-          <ReportActions className="animate-fade-up mt-7 max-w-xl [animation-delay:320ms]" />
-
-          <ul className="animate-fade-up mt-9 flex max-w-xl flex-col gap-3 border-t border-border pt-6 text-sm text-muted-foreground [animation-delay:400ms] sm:flex-row sm:flex-wrap sm:gap-x-6">
-            {FEATURES.map((f) => (
-              <li key={f.text} className="flex items-center gap-2">
-                <f.icon className="h-4 w-4 shrink-0 text-teal-deep" />
-                {f.text}
-              </li>
+          {/* POPULAR SEARCHES */}
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Popular
+            </span>
+            {POPULAR.map((item) => (
+              <Link
+                key={item}
+                to="/browse"
+                search={{ q: item }}
+                className="rounded-full border border-slate-200 bg-white/80 px-3.5 py-2 text-xs font-medium text-slate-600 transition-all hover:-translate-y-0.5 hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800"
+              >
+                {item}
+              </Link>
             ))}
-          </ul>
+          </div>
+
+          {/* ACTION CARDS */}
+          <div className="mt-10 grid gap-3 sm:grid-cols-2">
+            <Link
+              to="/report-lost"
+              className="group flex min-h-[108px] items-center gap-4 rounded-2xl bg-[#142544] p-5 text-white shadow-lg shadow-blue-950/15 transition-all duration-300 hover:-translate-y-1 hover:bg-[#1c355e] hover:shadow-xl"
+            >
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white/10 text-orange-300">
+                <PackageSearch className="h-6 w-6" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold">I lost something</span>
+                <span className="mt-1 block text-xs text-slate-300">
+                  Report a missing item
+                </span>
+              </span>
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-teal-300 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+            </Link>
+
+            <Link
+              to="/report-found"
+              className="group flex min-h-[108px] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-[#142544] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-300 hover:shadow-xl"
+            >
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-700">
+                <PackagePlus className="h-6 w-6" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold">I found something</span>
+                <span className="mt-1 block text-xs text-slate-500">
+                  Help return it to its owner
+                </span>
+              </span>
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-teal-600 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+            </Link>
+          </div>
+
+          {/* FEATURE STRIP */}
+          <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 border-t border-slate-200 pt-6 text-xs font-medium text-slate-500">
+            <span className="flex items-center gap-2">
+              <Search className="h-4 w-4 text-teal-700" />
+              Easy item discovery
+            </span>
+            <span className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-teal-700" />
+              Campus locations
+            </span>
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-teal-700" />
+              Community reporting
+            </span>
+          </div>
         </div>
 
-        {/* Visual */}
+        {/* RIGHT VISUAL */}
         <div className="relative lg:col-span-6">
-          <div className="animate-fade-up relative mx-auto max-w-2xl [animation-delay:200ms] lg:max-w-none">
-            <div className="absolute -inset-6 rounded-[3rem] bg-gradient-teal opacity-[0.08] blur-2xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-2 shadow-frame">
-              <div className="relative overflow-hidden rounded-[1.6rem]">
-                <img
-                  src={heroImage}
-                  alt="Tagged student belongings — ID card, wallet, keys, earbuds, water bottle and a book — on a campus lost and found desk"
-                  className="aspect-[5/4] w-full object-cover object-[50%_70%] sm:aspect-[4/3] lg:aspect-[5/5.2]"
-                  width={1536}
-                  height={1024}
-                  fetchPriority="high"
-                />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-navy-deep/45 to-transparent" />
-                <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1.5 text-xs font-medium text-foreground shadow-soft backdrop-blur">
-                  <MapPin className="h-3.5 w-3.5 text-teal-deep" /> Campus lost & found desk
+          <div className="absolute -inset-8 rounded-full bg-teal-200/30 blur-[75px]" />
+
+          <div className="relative mx-auto max-w-[570px]">
+            <div className="absolute -right-4 -top-4 h-full w-full rounded-[2.5rem] border border-teal-200/70 sm:-right-6 sm:-top-6" />
+
+            <div className="relative overflow-hidden rounded-[2rem] border-[7px] border-white bg-white shadow-[0_35px_90px_-30px_rgba(15,35,70,0.35)]">
+              <img
+                src={heroImage}
+                alt="Personal belongings such as an ID card, wallet, keys, earbuds and water bottle"
+                className="aspect-[1.08] w-full object-cover"
+                width={1100}
+                height={1005}
+              />
+
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#101c35]/90 via-[#101c35]/35 to-transparent p-7 pt-28 text-white sm:p-9 sm:pt-36">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-xs font-medium backdrop-blur-md">
+                  <Sparkles className="h-3.5 w-3.5 text-teal-300" />
+                  FindIt Campus Hub
                 </span>
+                <h2 className="mt-4 max-w-sm text-2xl font-bold leading-tight sm:text-3xl">
+                  Every lost item deserves a way home.
+                </h2>
+                <p className="mt-2 text-sm text-white/75">
+                  One place to report, search and reconnect.
+                </p>
               </div>
             </div>
 
-            <div className="absolute -left-3 top-8 hidden animate-float rounded-2xl border border-border bg-card/95 p-3 pr-4 shadow-elevated backdrop-blur sm:block lg:-left-8">
-              <div className="flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-teal-soft text-teal-deep">
-                  <ShieldCheck className="h-5 w-5" />
+            {/* Floating information card */}
+            <div className="absolute -left-3 top-10 flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-xl sm:-left-9 sm:top-14">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-teal-50 text-teal-700">
+                <CheckCircle2 className="h-6 w-6" />
+              </span>
+              <span>
+                <span className="block text-sm font-bold text-[#142544]">
+                  Lost & Found
                 </span>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Private by default</p>
-                  <p className="text-xs text-muted-foreground">Contact details stay hidden</p>
-                </div>
-              </div>
+                <span className="block text-xs text-slate-500">
+                  All in one campus hub
+                </span>
+              </span>
             </div>
 
-            <div className="absolute -right-2 -bottom-6 hidden animate-float rounded-2xl border border-border bg-card/95 p-4 shadow-elevated backdrop-blur [animation-delay:1.5s] sm:block lg:-right-6">
-              <div className="flex items-center gap-2 text-xs font-semibold text-teal-deep">
-                <Sparkles className="h-3.5 w-3.5" /> AI Smart Matching
-              </div>
-              <p className="mt-1 text-sm font-semibold text-foreground">Compares every new report</p>
-              <div className="mt-2.5 flex gap-1.5">
-                {["Category", "Place", "Date"].map((t) => (
-                  <span key={t} className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-navy-soft">
-                    {t}
-                  </span>
-                ))}
-              </div>
+            {/* Bottom floating card */}
+            <div className="absolute -bottom-6 -right-2 flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-xl sm:-right-7">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-blue-800">
+                <PackagePlus className="h-5 w-5" />
+              </span>
+              <span>
+                <span className="block text-sm font-bold text-[#142544]">
+                  Be part of the solution
+                </span>
+                <span className="block text-xs text-slate-500">
+                  Report. Discover. Return.
+                </span>
+              </span>
+              <ArrowRight className="ml-1 h-4 w-4 text-teal-700" />
             </div>
           </div>
         </div>

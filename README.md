@@ -1,7 +1,9 @@
 # FindIt Campus Hub – Campus Lost & Found
 
 FindIt Campus Hub is a web-based lost-and-found platform designed to help college students report lost belongings, report found items, and search for missing belongings through a centralized system.
+## Live Website
 
+https://findit-campus-igodw06q5-amit-kr.vercel.app
 ## Project Objectives
 
 - Provide a centralized platform for lost-and-found reports.
@@ -39,9 +41,9 @@ FindIt Campus Hub is a web-based lost-and-found platform designed to help colleg
 
 ## AI Tools Used During Development
 
-- **Lovable:** Used to generate the initial website frontend.
-- **ChatGPT:** Used for development assistance, debugging, integration guidance and chatbot testing.
-- **Google Gemini:** Used to review the project and suggest test cases and potential improvements.
+- **Lovable:** Used to generate the initial website frontend and project structure.
+- **ChatGPT:** Used for code debugging, Supabase and Groq API integration guidance, prompt refinement, and chatbot testing.
+- **Google Gemini:** Used to review the project, suggest chatbot test cases, and identify possible improvements related to security and reliability.
 
 ## Project Documentation
 
@@ -80,7 +82,17 @@ cd findit-campus-hub
 npm install
 ```
 
-4. Configure environment variables in a `.env` file using the variable names required by the project.
+4. Create a `.env` file in the project root and add these variables:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_PROJECT_ID`
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_PROJECT_ID`
+- `GROQ_API_KEY`
+
+Use your own project credentials. Never commit the `.env` file or expose secret API keys.
 
 **Important:** Never upload API keys, passwords or other secrets to GitHub.
 
@@ -108,8 +120,8 @@ Refer to `docs/test-results.md` for the recorded test cases and outcomes.
 - Improve semantic item matching.
 - Improve location-based search accuracy.
 - Add image-based item recognition.
-- Improve chatbot error handling and security.
-- Complete deployment and additional testing.
+- Enhance chatbot security and error handling.
+- Add more testing for different user scenarios.
 
 ## Repository
 
